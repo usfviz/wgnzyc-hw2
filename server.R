@@ -33,6 +33,7 @@ colnames(melt_popu) <- c("country","Country.Code","indecator_p","indicator_code_
 
 merge_pop <- merge(merge_abbr,melt_popu,by = intersect(names(merge_abbr),names(melt_popu)))
 merge_pop <- merge_pop[merge_pop$Region!="",]
+merge_pop$Region <- droplevels(merge_pop$Region)
 merge_pop$population <- as.numeric(merge_pop$population)
 regions <- levels(merge_pop$Region)
 regions <- regions[regions!=""]
@@ -74,7 +75,7 @@ server <- function(input, output) {
   sdt %>% 
     ggvis(~fertility, ~life_expectancy) %>%
     add_tooltip(all_values, "hover")%>%
-    layer_points(fill = ~Region,size := ~population/100000000*point_size() + 50, stroke := "black",opacity := 0.5) %>%
+    layer_points(fill = ~Region,size := ~population/100000000*point_size() + 50, stroke := "black",opacity := 0.4) %>%
     layer_points(data = continent,fill = cont_selected,size := ~population/100000000*point_size() + 50, stroke := "black")%>%
     add_legend("fill", title = "Region")%>%
     bind_shiny("ggvis", "ggvis_ui")
