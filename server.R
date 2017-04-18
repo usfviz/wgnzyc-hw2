@@ -23,6 +23,8 @@ le_api_long$variable <- substr(le_api_long$variable, 2, 5)
 colnames(tfrt_api_long) <- c("country","Country.Code","indecator_le","indicator_code_le","year","fertility")
 colnames(le_api_long) <- c("country","Country.Code","indecator_fe","indicator_code_fe","year","life_expectancy")
 
+
+
 merge_two <- merge(tfrt_api_long,le_api_long,by = intersect(names(tfrt_api_long),names(le_api_long)))
 merge_abbr <- merge(merge_two,tfrt_abbr,by = intersect(names(merge_two),names(tfrt_abbr)))
 
@@ -38,6 +40,10 @@ merge_pop$population <- as.numeric(merge_pop$population)
 regions <- levels(merge_pop$Region)
 regions <- regions[regions!=""]
 
+merge_pop <- merge_pop[!is.na(merge_pop$life_expectancy),]
+merge_pop <- merge_pop[!is.na(merge_pop$fertility),]
+
+merge_pop[merge_pop$country == 'Israel',c('fertility','life_expectancy')]
 
 ui <- fluidPage(
   headerPanel('Life Expectancy and Fertility Rate'),
@@ -57,7 +63,7 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   sdt <- reactive({tmp = merge_pop[merge_pop$year==input$year,]
-                    tmp = tmp[tmp$Region != "",]
+                   tmp = tmp[tmp$Region != "",]
                    tmp})
   point_size <- reactive(input$size)
   cont_selected <- reactive(input$continent)
@@ -73,10 +79,12 @@ server <- function(input, output) {
     row$country
   }
   sdt %>% 
-    ggvis(~fertility, ~life_expectancy) %>%
+    ggvis(~life_expectancy,~fertility) %>%
     add_tooltip(all_values, "hover")%>%
     layer_points(fill = ~Region,size := ~population/100000000*point_size() + 50, stroke := "black",opacity := 0.4) %>%
     layer_points(data = continent,fill = cont_selected,size := ~population/100000000*point_size() + 50, stroke := "black")%>%
+    scale_numeric("x", domain = c(10, 90), nice = FALSE) %>%
+    scale_numeric("y", domain = c(1, 9), nice = FALSE)%>%
     add_legend("fill", title = "Region")%>%
     bind_shiny("ggvis", "ggvis_ui")
     
