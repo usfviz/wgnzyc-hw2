@@ -20,8 +20,8 @@ le_api_long <- melt_func(le_api)
 tfrt_api_long$variable <- substr(tfrt_api_long$variable, 2, 5)
 le_api_long$variable <- substr(le_api_long$variable, 2, 5)
 
-colnames(tfrt_api_long) <- c("country","Country.Code","indecator_le","indicator_code_le","year","life_expectancy")
-colnames(le_api_long) <- c("country","Country.Code","indecator_fe","indicator_code_fe","year","fertility")
+colnames(tfrt_api_long) <- c("country","Country.Code","indecator_le","indicator_code_le","year","fertility")
+colnames(le_api_long) <- c("country","Country.Code","indecator_fe","indicator_code_fe","year","life_expectancy")
 
 merge_two <- merge(tfrt_api_long,le_api_long,by = intersect(names(tfrt_api_long),names(le_api_long)))
 merge_abbr <- merge(merge_two,tfrt_abbr,by = intersect(names(merge_two),names(tfrt_abbr)))
